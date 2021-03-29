@@ -3,14 +3,12 @@
  */
 #define KEY_NONE 0x0
 
-//Active HIGH or LOW encoders
-#define r_polarity HIGH
-
 //Switch press times in ms according to the zynthian UI Users Guide
 #define sw_short 1
 #define sw_bold  300
 #define sw_long  2000
-        
+
+#define PIN_NA   999 /* Indicate HW pin not used */
 /**************************************************************
  * Typedefs
  */
@@ -29,6 +27,7 @@ typedef struct KeyMap_s {
  */
 byte cw = 1;
 byte ccw = 2;
+boolean invert_encoders = false;
 
 /**************************************************************
  * Macros
@@ -46,8 +45,9 @@ byte ccw = 2;
         int r_##enc_name##_gnd=enc_gnd; int r_##enc_name##_vcc=enc_vcc; \
         int r_##enc_name##_sw=enc_sw; int r_##enc_name##_a=enc_a; int r_##enc_name##_b=enc_b;
                                   
-#define ENCODER_SET_GPIO(enc_name) { pinMode(r_##enc_name##_gnd, OUTPUT); pinMode(r_##enc_name##_vcc, OUTPUT); digitalWrite(r_##enc_name##_gnd, 0);\
-                             digitalWrite(r_##enc_name##_vcc, 1); r_##enc_name.setTrigger(r_polarity); }while(0)
+#define ENCODER_SET_GPIO(enc_name) { if(r_##enc_name##_gnd != PIN_NA) { pinMode(r_##enc_name##_gnd, OUTPUT); digitalWrite(r_##enc_name##_gnd, 0); }\
+                                     if(r_##enc_name##_gnd != PIN_NA) { pinMode(r_##enc_name##_vcc, OUTPUT); digitalWrite(r_##enc_name##_vcc, 1); }\
+                                     r_##enc_name.setTrigger(r_polarity); }while(0)
 
 #define ENCODER_PROCESS(enc_name) encoder_process(&r_##enc_name,&r_##enc_name##_sw_time,&r_##enc_name##_lp,&r_##enc_name##_map)
 
@@ -67,7 +67,7 @@ byte ccw = 2;
                         boolean b_##btn_name##_lp; \
                         KeyMap_t b_##btn_name##_map = { 0, 0, 0, btn_sw, short_mod, bold_mod, long_mod };
 
-#define BUTTON_SET_GPIO(btn_name) { pinMode(b_##btn_name##_gpio, INPUT_PULLUP); }while(0)
+#define BUTTON_SET_GPIO(btn_name) { if( b_##btn_name##_gpio != PIN_NA) { pinMode(b_##btn_name##_gpio, INPUT_PULLUP); } }while(0)
 
 #define BUTTON_PROCESS(btn_name) button_process(&b_##btn_name##_map,b_##btn_name##_gpio,&b_##btn_name##_sw_start,&b_##btn_name##_sw_time,&b_##btn_name##_lp)
 
@@ -78,7 +78,7 @@ void press_process(KeyMap_t *k_map, int sw, int * sw_pending, boolean * long_pre
  */
 int btn_pushTime(int pin, int * sw_start) { 
   int sw = 0;
-  if( !digitalRead(pin) ) {
+  if( (pin != PIN_NA) && !digitalRead(pin) ) {
     if( *sw_start == 0 ) {
       *sw_start = millis(); //starting tick of button press
     }
