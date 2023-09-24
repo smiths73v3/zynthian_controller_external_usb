@@ -39,7 +39,18 @@
   |SW2| OFF |
   |SW3| ON  |
   
-  
+  Board appears as "STM32 Bootloader" in Device Manager
+  Here is a config that works in platformio.ini for this project:
+        [env:genericSTM32F401CC]
+        platform = ststm32
+        board = genericSTM32F401CC
+        framework = arduino
+        build_flags = 
+          -D PIO_FRAMEWORK_ARDUINO_ENABLE_HID
+          -D USBCON
+          -D HAL_PCD_MODULE_ENABLED
+        lib_deps = mprograms/SimpleRotary@^1.1.3
+        upload_protocol = dfu
 */
 
 //LED Indicator pin 

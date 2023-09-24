@@ -22,7 +22,7 @@
                                                                              
  For a full copy of the GNU General Public License see the LICENSE.txt file. 
 *******************************************************************                                                                             
-  w/ Simple Rotary 1.1.2 Library from mprograms
+  w/ Simple Rotary 1.1.3 Library from mprograms
 *******************************************************************
  * Keymappings for reference - Oct 25th 2020
  Back Down    - "down" "Caps Lock"
